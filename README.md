@@ -15,6 +15,27 @@ $ whichpr show SHA1 # => Display a pull request number
 $ whichpr open SHA1 # => Open a pull request by your browser
 ```
 
+### Vim integration
+
+Add the following code to your `.vimrc`.
+
+```vim
+set rtp+=~/path/to/pocke/whichpr/
+```
+
+Execute the following command to open a pull request.
+
+```vim
+:call whichpr#open()
+```
+
+If you need keybind, please configure yourself.
+For example:
+
+```vim
+nnoremap <F5> :call whichpr#open()<CR>
+```
+
 ## License
 
 Copyright 2017 Masataka Kuwabara (pocke)
