@@ -4,9 +4,13 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"path/filepath"
+
+	"golang.org/x/oauth2"
 
 	"github.com/github/hub/github"
 	api "github.com/google/go-github/github"
+	homedir "github.com/mitchellh/go-homedir"
 	"github.com/pkg/errors"
 	"github.com/skratchdot/open-golang/open"
 )
@@ -74,7 +78,10 @@ func PullRequestNumber(prj *github.Project, sha1 string) (int, error) {
 	repo := prj.String()
 
 	// TODO: sort
-	client := api.NewClient(nil)
+	client, err := APIClient()
+	if err != nil {
+		return 0, err
+	}
 	res, _, err := client.Search.Issues(context.Background(), fmt.Sprintf("%s is:merged repo:%s", sha1, repo), nil)
 	if err != nil {
 		return 0, err
@@ -98,4 +105,29 @@ func Project() (*github.Project, error) {
 	}
 
 	return prj, nil
+}
+
+func APIClient() (*api.Client, error) {
+	homeDir, err := homedir.Dir()
+	if err != nil {
+		return nil, err
+	}
+
+	confPath := filepath.Join(homeDir, ".config", "whichpr")
+	err = os.Setenv("HUB_CONFIG", confPath)
+	if err != nil {
+		return nil, err
+	}
+
+	c := github.CurrentConfig()
+	host, err := c.DefaultHost()
+	if err != nil {
+		return nil, err
+	}
+
+	ts := oauth2.StaticTokenSource(
+		&oauth2.Token{AccessToken: host.AccessToken},
+	)
+	tc := oauth2.NewClient(context.Background(), ts)
+	return api.NewClient(tc), nil
 }
