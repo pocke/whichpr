@@ -21,6 +21,10 @@ Add the following code to your `.vimrc`.
 
 ```vim
 set rtp+=~/path/to/pocke/whichpr/
+
+" If you need keybind, please configure yourself.
+" For example:
+nnoremap <F5> :call whichpr#open()<CR>
 ```
 
 Execute the following command to open a pull request.
@@ -29,12 +33,6 @@ Execute the following command to open a pull request.
 :call whichpr#open()
 ```
 
-If you need keybind, please configure yourself.
-For example:
-
-```vim
-nnoremap <F5> :call whichpr#open()<CR>
-```
 
 ## License
 
