@@ -33,6 +33,11 @@ Execute the following command to open a pull request.
 :call whichpr#open()
 ```
 
+## Links
+
+- http://qiita.com/pocke/items/281e9157a530a6142178 (Japanese blog)
+
+
 
 ## License
 
