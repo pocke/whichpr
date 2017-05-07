@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 
@@ -17,6 +18,30 @@ import (
 
 const Usage = "Usage: whichpr show|open SHA1"
 
+type ErrorMessage struct {
+	message string
+}
+
+func NewErrorMessage(message string) *ErrorMessage {
+	var m string
+	if message == "" {
+		m = Usage
+	} else {
+		m = fmt.Sprintf("%s\n%s", Usage, message)
+	}
+	return &ErrorMessage{
+		message: m,
+	}
+}
+
+func (e *ErrorMessage) Error() string {
+	return e.message
+}
+
+func (e *ErrorMessage) Format(s fmt.State, verb rune) {
+	io.WriteString(s, e.message)
+}
+
 func main() {
 	if err := Main(os.Args); err != nil {
 		fmt.Fprintf(os.Stderr, "%+v\n", err)
@@ -26,7 +51,7 @@ func main() {
 
 func Main(args []string) error {
 	if len(args) != 3 {
-		return errors.New("Usage: whichpr show|open SHA1")
+		return NewErrorMessage("")
 	}
 	command := args[1]
 	sha1 := args[2]
@@ -36,7 +61,7 @@ func Main(args []string) error {
 	case "open":
 		return Open(sha1)
 	default:
-		return fmt.Errorf("%s\n%s is unknown command", Usage, command)
+		return NewErrorMessage(fmt.Sprintf("%s is unknown command", command))
 	}
 }
 
@@ -73,7 +98,7 @@ func Open(sha1 string) error {
 
 func PullRequestNumber(prj *github.Project, sha1 string) (int, error) {
 	if len(sha1) < 7 {
-		return 0, errors.New("SHA1 must be at least seven characters")
+		return 0, NewErrorMessage("SHA1 must be at least seven characters")
 	}
 	repo := prj.String()
 
