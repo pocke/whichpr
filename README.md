@@ -8,6 +8,29 @@ Find a pull request form commit hash.
 go get github.com/pocke/whichpr
 ```
 
+### OAuth token setting
+
+First time, whichpr asks GitHub username and password.
+
+```bash
+$ whichpr open <SHA1>
+github.com username: <Enter your username>
+github.com password for pocke (never stored): <Enter your password>
+two-factor authentication code: <Enter 2FA code if you use 2FA>
+```
+
+If you don't want to enter your password, you can register a personal access token manually.
+
+1. Generate a token from [here](https://github.com/settings/tokens/new).
+    - `repo` scope is required if you want to access your private repositories.
+1. Create `~/.config/whichpr` with the following content.
+    ```
+    github.com:
+    - user: <your username>
+      oauth_token: <your token>
+      protocol: https
+    ```
+
 ## Usage
 
 ```bash
