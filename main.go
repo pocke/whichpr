@@ -5,7 +5,11 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"regexp"
+	"strconv"
+	"strings"
 
 	"golang.org/x/oauth2"
 
@@ -100,6 +104,10 @@ func PullRequestNumber(prj *github.Project, sha1 string) (int, error) {
 	if len(sha1) < 7 {
 		return 0, NewErrorMessage("SHA1 must be at least seven characters")
 	}
+	pr, err := SquashedPullReqNum(sha1)
+	if err == nil {
+		return pr, nil
+	}
 	repo := prj.String()
 
 	// TODO: sort
@@ -116,6 +124,20 @@ func PullRequestNumber(prj *github.Project, sha1 string) (int, error) {
 	}
 
 	return *res.Issues[0].Number, nil
+}
+
+func SquashedPullReqNum(sha1 string) (int, error) {
+	out, err := exec.Command("git", "log", "--pretty=format:%s", "-n", "1", sha1).Output()
+	if err != nil {
+		return 0, err
+	}
+	msg := strings.Split(string(out), "\n")[0]
+	re := regexp.MustCompile(`\(\#(\d+)\)$`)
+	match := re.FindStringSubmatch(msg)
+	if len(match) == 0 {
+		return 0, errors.New("Does not match")
+	}
+	return strconv.Atoi(match[1])
 }
 
 // RepoName returns owner/repo.
