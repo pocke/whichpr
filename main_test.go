@@ -39,10 +39,52 @@ func TestSquashedPullReqNum(t *testing.T) {
 			t.Error("Expected: error, but got nil")
 		}
 		if err.Error() != "Does not match" {
-			t.Error("Expected: 'Does not match', but got %s", err.Error())
+			t.Errorf("Expected: 'Does not match', but got %s", err.Error())
 		}
 	})
 }
+
+func TestIsParent_whenEqual(t *testing.T) {
+	if !isParent("51ed8a271", "51ed8a271d02d1c2a1fb5166d0679e23a0436fd7") {
+		t.Error(":(")
+	}
+}
+
+func TestIsParent_whenNotEq(t *testing.T) {
+	inGitDir(t, func() {
+		err := sh(`
+			git tag first-commit
+			git checkout -b foobar
+			git commit --no-gpg-sign --allow-empty -m 'foo'
+			git tag 1br
+			git commit --no-gpg-sign --allow-empty -m 'bar'
+			git tag 2br
+			git checkout master
+			git commit --no-gpg-sign --allow-empty -m 'baz'
+			git tag 1master
+			git commit --no-gpg-sign --allow-empty -m 'piyo'
+			git tag 2master
+			git merge --no-gpg-sign -m 'merge' foobar
+		`)
+		if err != nil {
+			t.Error(err)
+		}
+		if !isParent("1br", "2br") {
+			t.Error(":(")
+		}
+		if !isParent("1master", "2master") {
+			t.Error(":(")
+		}
+		if isParent("2br", "1br") {
+			t.Error(":(")
+		}
+		if isParent("2br", "1master") {
+			t.Error(":(")
+		}
+	})
+}
+
+// helpers
 
 func inGitDir(t *testing.T, f func()) {
 	// Prepare a git repository
@@ -57,8 +99,8 @@ func inGitDir(t *testing.T, f func()) {
 		t.Fatal(err)
 	}
 
-	if err := os.Chdir(dir); err != nil {
-		t.Fatal(err)
+	if e := os.Chdir(dir); e != nil {
+		t.Fatal(e)
 	}
 	defer os.Chdir(pwd)
 
