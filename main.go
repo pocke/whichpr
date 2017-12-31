@@ -108,6 +108,11 @@ func PullRequestNumber(prj *github.Project, sha1 string) (int, error) {
 	if err == nil {
 		return pr, nil
 	}
+	pr, err = MergedPullRequestNum(sha1)
+	if err == nil {
+		return pr, nil
+	}
+
 	repo := prj.String()
 
 	// TODO: sort
@@ -138,6 +143,27 @@ func SquashedPullReqNum(sha1 string) (int, error) {
 		return 0, errors.New("Does not match")
 	}
 	return strconv.Atoi(match[1])
+}
+
+func MergedPullRequestNum(sha1 string) (int, error) {
+	out, err := exec.Command("git", "log", "--merges", "--pretty=format:%P %s", "--reverse", "--ancestry-path", sha1+"..@").Output()
+	if err != nil {
+		return 0, err
+	}
+	msgs := strings.Split(string(out), "\n")
+	re := regexp.MustCompile(`^(?:[a-f0-9]+ ){2}Merge pull request \#(\d+) from `)
+	mergeCommit, err := findRegexp(msgs, re)
+	if err != nil {
+		return 0, err
+	}
+
+	pr := re.FindStringSubmatch(mergeCommit)[1]
+
+	if isParent(sha1, regexp.MustCompile(`\w+ (\w+) `).FindStringSubmatch(mergeCommit)[1]) {
+		return strconv.Atoi(pr)
+	} else {
+		return 0, errors.Errorf("%s is not parent", sha1)
+	}
 }
 
 // RepoName returns owner/repo.
@@ -177,4 +203,25 @@ func APIClient() (*api.Client, error) {
 	)
 	tc := oauth2.NewClient(context.Background(), ts)
 	return api.NewClient(tc), nil
+}
+
+func findRegexp(arr []string, re *regexp.Regexp) (string, error) {
+	for _, str := range arr {
+		if re.MatchString(str) {
+			return str, nil
+		}
+	}
+	return "", fmt.Errorf("Missing")
+}
+
+func isParent(parent, child string) bool {
+	if strings.HasPrefix(child, parent) {
+		return true
+	}
+	b, err := exec.Command("git", "log", "--ancestry-path", parent+".."+child).Output()
+	if err != nil {
+		return false
+	}
+
+	return len(b) != 0
 }
