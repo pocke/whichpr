@@ -2,7 +2,6 @@
 
 Find a pull request form commit hash.
 
-
 ![A screen capture](https://user-images.githubusercontent.com/4361134/34467899-87456686-ef40-11e7-8a7a-6cb52a8324e0.gif)
 
 ## Installation
@@ -60,6 +59,7 @@ Execute the following command to open a pull request.
 
 ## Links
 
+- https://medium.com/@pocke/whichpr-find-a-pull-request-with-a-commit-hash-c2defe4e0b58
 - http://qiita.com/pocke/items/281e9157a530a6142178 (Japanese blog)
 
 
