@@ -1,4 +1,4 @@
-# whichpr
+# WhichPR
 
 Find a pull request form commit hash.
 
