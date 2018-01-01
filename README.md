@@ -2,6 +2,9 @@
 
 Find a pull request form commit hash.
 
+
+![A screen capture](https://user-images.githubusercontent.com/4361134/34467899-87456686-ef40-11e7-8a7a-6cb52a8324e0.gif)
+
 ## Installation
 
 You can download a binary from release page. Please download a binary and place it in `$PATH` directory.
