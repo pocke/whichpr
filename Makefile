@@ -6,3 +6,6 @@ release:
 
 snapshot:
 	goreleaser --snapshot
+
+clean:
+	rm -r dist
