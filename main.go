@@ -20,7 +20,12 @@ import (
 	"github.com/skratchdot/open-golang/open"
 )
 
-const Usage = "Usage: whichpr show|open SHA1"
+const Usage = `Usage:
+	whichpr show|open SHA1
+	whichpr version
+`
+
+var version = "master"
 
 type ErrorMessage struct {
 	message string
@@ -54,19 +59,33 @@ func main() {
 }
 
 func Main(args []string) error {
-	if len(args) != 3 {
+	if len(args) < 2 {
 		return NewErrorMessage("")
 	}
 	command := args[1]
-	sha1 := args[2]
 	switch command {
 	case "show":
+		if len(args) != 3 {
+			return NewErrorMessage("")
+		}
+		sha1 := args[2]
 		return Show(sha1)
 	case "open":
+		if len(args) != 3 {
+			return NewErrorMessage("")
+		}
+		sha1 := args[2]
 		return Open(sha1)
+	case "version":
+		return Version()
 	default:
 		return NewErrorMessage(fmt.Sprintf("%s is unknown command", command))
 	}
+}
+
+func Version() error {
+	fmt.Println(version)
+	return nil
 }
 
 func Show(sha1 string) error {
