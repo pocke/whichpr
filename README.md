@@ -64,7 +64,7 @@ Execute the following command to open a pull request.
 
 ## License
 
-Copyright 2017 Masataka Kuwabara (pocke)
+Copyright 2017-2018 Masataka Kuwabara (pocke)
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
