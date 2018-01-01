@@ -4,9 +4,8 @@ Find a pull request form commit hash.
 
 ## Installation
 
-```bash
-go get github.com/pocke/whichpr
-```
+You can download a binary from release page. Please download a binary and place it in `$PATH` directory.
+https://github.com/pocke/whichpr/releases
 
 ### OAuth token setting
 
